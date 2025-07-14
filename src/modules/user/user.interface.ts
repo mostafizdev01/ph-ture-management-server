@@ -36,7 +36,7 @@ export interface IUser {
     address ?: string;
     isDeleted ? : string;
     isActive ? : isActive;  // isActive a enum create kora hoise.
-    isVerified ? : string;
+    isVerified ? : boolean;
     role: Role;   /// enum diye user er role create kora hoise.
     auths: IAuthProvider[]; // ekta user ki vabe login korse sei data IAuthProvider er mordhe rakha hoise.
     bookings ?: Types.ObjectId[]; // ekta user joto gula booking korese sob id or info gula ai array er mordhe rekhe dibo

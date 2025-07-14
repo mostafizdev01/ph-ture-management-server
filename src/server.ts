@@ -5,6 +5,7 @@ import app from "./app";
 // const PORT = envVars.PORT
 import { Server } from "http"
 import { envVars } from "./config/env";
+import { seedSuperAdmin } from "./middlewares/seedSuperAdmin";
 let server: Server
 
 
@@ -22,7 +23,10 @@ const startServer = async () => {
 }
 
 
-startServer();
+(async() => { /// call IIFE function
+   await startServer();
+   await seedSuperAdmin()
+})()
 
 
 // ** The server can be down for 3 main reasons:
