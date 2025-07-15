@@ -18,9 +18,10 @@ export const checkAuth = (...authRoles: string[]) => (req: Request, res: Respons
         const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_TOKEN) as JwtPayload
 
         if (!authRoles.includes(verifiedToken.role)) {
+            res.send({message: "You are not Permitted to view this route!!!"})
             throw new AppError(403, "You are not Permitted to view this route!!!")
         }
-
+        req.user = verifiedToken
         next()
 
     } catch (err) {

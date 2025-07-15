@@ -7,7 +7,6 @@ import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
 
 
-
 const createUser = async (payload: Partial<IUser>) => {
     const {email, password, ...rest} = payload;
 
@@ -35,7 +34,21 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
         if(decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE){
             throw new AppError(httpStatus.FORBIDDEN, "You are not authorized")
         }
+        if(payload.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
+            throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
+        }
     }
+    if(payload.isActive || payload.isDeleted || payload.isVerified) {
+        if(decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE){
+            throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
+        }
+    }
+    if(payload.password) {
+       payload.password = await bcrypt.hash(payload.password, Number(envVars.BCRYPT_SALT_ROUND))
+    }
+
+    const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {new: true, runValidators: true});
+    return newUpdatedUser;
 }
 
 const getAllUsers = async () => {
