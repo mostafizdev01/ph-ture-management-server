@@ -1,12 +1,9 @@
-import { verifyToken } from './../../utilis/jwt';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes"
 import { UserServices } from "./user.service";
 import { catchAsync } from "../../utilis/catchAsync";
 import { sendResponse } from "../../utilis/sendResponse";
-import { envVars } from '../../config/env';
-import { JwtPayload } from 'jsonwebtoken';
 // import AppError from "../../errorHelpers/AppError";            
 
 
@@ -48,8 +45,9 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
 const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     
     const userId = req.params.id;
-    const token = req.headers.authorization;
-    const verifiedToken = verifyToken(token as string, envVars.JWT_ACCESS_TOKEN) as JwtPayload
+    // const token = req.headers.authorization;
+    // const verifiedToken = verifyToken(token as string, envVars.JWT_ACCESS_TOKEN) as JwtPayload
+    const verifiedToken = req.user;
     const payload = req.body;
 
     const user = await UserServices.updateUser(userId, payload, verifiedToken)
