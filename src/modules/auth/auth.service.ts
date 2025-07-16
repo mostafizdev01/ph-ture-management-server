@@ -29,9 +29,16 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     }
 
     const accessToken = generateToken(jwtPayload, envVars.JWT_ACCESS_TOKEN, envVars.JWT_ACCESS_EXPIRES)
+    const refreshToken = generateToken(jwtPayload, envVars.JWT_REFRESH_TOKEN, envVars.JWT_REFRESH_EXPIRES)
+
+    // delete isUserExist.password // hide user password of security purpas
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const {password: Pass, ...rest} = isUserExist.toObject() // hide user password of security purpas && show data in object format
 
     return {
-        accessToken
+        accessToken,
+        refreshToken,
+        user: rest
     }
 }
 
