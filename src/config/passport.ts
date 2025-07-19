@@ -1,10 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import passport from "passport";
 import {Strategy as GoogleStrategy, Profile, VerifyCallback} from "passport-google-oauth20"
+import {Strategy as LocalStrategy} from "passport-local";
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
 import { Role } from "../modules/user/user.interface";
+import bcryptjs from 'bcryptjs';
 
+
+// LOGIN WITH CREDENTIAL FUNCTIONALITY
+passport.use(new LocalStrategy({
+    usernameField: "email",
+    passwordField: "password"
+}, async (email: string, password: string, done: any)=>{
+    try {
+        const isUserExist = await User.findOne({email})
+
+        if(!isUserExist){
+            return done("User does not exits")
+        }
+
+       const isGoogleAuthenticated = isUserExist.auths.some(providerObjects => providerObjects.provider === "google") // Not Understand this line
+       
+       if(isGoogleAuthenticated && !isUserExist.password){
+        return done(null, false, {message: "you are google authenticated. Please set password then try agin."})
+       }
+
+       const isPasswordMatch = await bcryptjs.compare(password as string, isUserExist.password as string)
+
+       if(!isPasswordMatch){
+        return done(null, false, {message: "Password does not match"})
+       }
+
+       return done(null, isUserExist)
+    } catch (error) {
+        done(error)
+    }
+}))
+
+// LOGIN WITH GOOGLE STRATEGY
 passport.use(
     new GoogleStrategy (
      {
